@@ -1,0 +1,33 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv(r'C:\Users\Reikonen\Downloads\Python Data\restaurant_ranking_2020.csv',sep=',')
+#print(df)
+
+#read_data.head(n=5)
+
+
+# block 2 - group by
+groupby_sum1 = df.groupby(['Segment_Category'],sort = False).sum() #count total sales for each segment
+groupby_count1 = df.groupby(['Segment_Category']).count() #count how many restaurant in each segment
+
+
+#Sales ranking and sorting 
+
+df["Rank"] =  df["Sales"].rank(ascending = False)
+
+
+df_rank_with_sales = df.iloc[:,[0,1,3]] #data frame with selected column
+
+df_rank_with_sales.sort_values("Sales", inplace = True,ascending = False)
+
+get_rank = df_rank_with_sales.head(20) #get data frame for top 20 sales
+
+get_highest_country = groupby_sum1.head(1) #get highest sales in segment 
+
+get_rank.plot(x ='Restaurant', y='Sales', kind = 'bar') #plot a graph using top 20 data
+plt.show()
+
+
+print("a) " , get_rank)
+print("b) " ,get_highest_country)
