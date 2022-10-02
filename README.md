@@ -16,3 +16,4 @@ Segment_Category - Menu type and / or industry segment
 Example:
 a. What are the top 20 restaurant according to sales?
 b. What segment has the highest sales?
+c. Plot bar graph for each finding
