@@ -2,32 +2,41 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 df = pd.read_csv(r'C:\Users\Reikonen\Downloads\Python Data\restaurant_ranking_2020.csv',sep=',')
-#print(df)
 
 #read_data.head(n=5)
+df['YOY_Sales'] = df['YOY_Sales'].apply(lambda x: float(x.split()[0].replace('%', ''))) #change data type from object to float 
+
+df_segment_data_restaurant = df.iloc[:,[1,8]] #get data frame from restaurant and segment column
+df_segment_data_sales = df.iloc[:,[1,3,8]] #get data frame from restaurant , sales and segment column
+df_rank_with_sales = df.iloc[:,[1,3]] #data frame with from restaurant and sales column
+df_rank_restaurant_by_YOY_sales = df.iloc[:,[1,4]] #data frame with from restaurant and YOY_sales column
 
 
-# block 2 - group by
-groupby_sum1 = df.groupby(['Segment_Category'],sort = False).sum() #count total sales for each segment
-groupby_count1 = df.groupby(['Segment_Category']).count() #count how many restaurant in each segment
-
+#group by
+groupby_count = df_segment_data_restaurant.groupby(['Segment_Category']).count().reset_index() #count how many restaurant in each segment
+groupby_sum_segment_sales = df_segment_data_sales.groupby(['Segment_Category'],sort = False).sum().reset_index() #sort segment based on total sales of each segment
 
 #Sales ranking and sorting 
 
-df["Rank"] =  df["Sales"].rank(ascending = False)
-
-
-df_rank_with_sales = df.iloc[:,[0,1,3]] #data frame with selected column
-
-df_rank_with_sales.sort_values("Sales", inplace = True,ascending = False)
+df_rank_with_sales.sort_values("Sales", inplace = True,ascending = False) #sort restaurant based on sales
+groupby_sum_segment_sales.sort_values("Sales", inplace = True, ascending = False) #sort segment based on sales
+groupby_count.sort_values("Restaurant", inplace = True,ascending = False) #sort segment based on restaurant count
+df_rank_restaurant_by_YOY_sales.sort_values("YOY_Sales", inplace = True , ascending = False) #sort restaurant based on YOY_sales count
 
 get_rank = df_rank_with_sales.head(20) #get data frame for top 20 sales
+segment_rank = groupby_sum_segment_sales.head(10) #get data frame for top 10 sales by segment
+restaurant_count = groupby_count.head(10) #get data frame for top 10 segment by restaurant count
+highest_sales_increase = df_rank_restaurant_by_YOY_sales.head(10)
+get_highest_segment = groupby_sum_segment_sales.head(1) #get highest sales in segment 
 
-get_highest_country = groupby_sum1.head(1) #get highest sales in segment 
+#plot graph using matplot
 
-get_rank.plot(x ='Restaurant', y='Sales', kind = 'bar') #plot a graph using top 20 data
-plt.show()
-
+get_rank.plot(x ='Restaurant', y='Sales', kind = 'bar' , color = 'm' , title = 'Sales By Top 20 Restaurant') #plot a bar graph using top 20 sales per restaurant
+segment_rank.plot(x ='Segment_Category', y='Sales', kind = 'bar' ,  color = 'green' ,  title = 'Sales By Top 20 Segment Category')  #plot a bar graph using top 20 sales per segment
+highest_sales_increase.plot(x ='Restaurant', y='YOY_Sales', kind = 'barh' ,  color = 'pink' ,  title = 'YOY_Sales By Restaurant') #plot a vertical bar graph using top 10 highest count of restaurant in by segment
 
 print("a) " , get_rank)
-print("b) " ,get_highest_country)
+print("b) " ,get_highest_segment)
+print(highest_sales_increase)
+print(df_rank_restaurant_by_YOY_sales.dtypes)
+plt.show()
